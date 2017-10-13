@@ -54,7 +54,6 @@
       <?php
         if(!isset($_SESSION['steamid'])) {
           echo '<script>console.log("User not authenticated, opening Steam OAuth Modal")</script>';
-          echo '<script> $("#AuthModal").modal("show");</script>';
         } else {
           include ('steamauth/userInfo.php');
           echo '<script>console.log("User authenticated through Steam OAuth. Loading logs.")</script>';
@@ -74,8 +73,7 @@
     $logpath = $path;
   } 
 ?>  
-<div class="content">
-
+<div class="blurContent">
  <!-- Fixed navbar -->
  <div class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
