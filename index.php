@@ -1,16 +1,9 @@
 <?php
+  require ('steamauth/steamauth.php');
+  unset($_SESSION['steam_uptodate']);
 
-include 'config.php';
-if (!isset($_GET['view'])) {
-   
-$ftp_connection = ftp_connect($host,$port);
-      
-ftp_login($ftp_connection, $user, $password);
-if ($passiveftp == 1) {
-   ftp_pasv($ftp_connection, true);
-}
-$logpath = $path;
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -19,12 +12,9 @@ $logpath = $path;
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
-
-    <title>Log Viewer</title>
-
+    <title>Suss Logs</title>
     <!-- Material Design Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-material-design/4.0.2/bootstrap-material-design.min.css" integrity="sha256-X/mlyZAafJ8j5e74pWh4+qNUD1zurCvLA6hODVobQX0=" crossorigin="anonymous" />
-
     <!-- Custom styles for this template -->
     <link href="css/sticky.css" rel="stylesheet">
 
@@ -43,8 +33,51 @@ $logpath = $path;
     <!-- Wrap all page content here -->
     <div id="wrap">
 
-      <!-- Fixed navbar -->
-      <div class="navbar navbar-default navbar-fixed-top" role="navigation">
+      <!-- Modal -->
+    <div id="authModal" class="modal hide fade" data-keyboard="false" data-backdrop="static" role="dialog" href="#AuthModal">
+    <div class="modal-dialog">
+
+    <!-- Modal content-->
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">SussLogs</h4>
+      </div>
+      <div class="modal-body">
+        <h6>Welcome! Please log in with Steam:</h6>
+        <?php 
+        loginbutton(); //login button
+        ?>
+      </div>
+    </div>
+
+      <?php
+        if(!isset($_SESSION['steamid'])) {
+          echo '<script>console.log("User not authenticated, opening Steam OAuth Modal")</script>';
+          echo '<script> $("#AuthModal").modal("show");</script>';
+        } else {
+          include ('steamauth/userInfo.php');
+          echo '<script>console.log("User authenticated through Steam OAuth. Loading logs.")</script>';
+          echo '<script>console.log("DEBUG: SteamID:' . $steamprofile['steamid'] . '")</script>';
+          echo '<script>console.log("DEBUG: Steam Name:' . $steamprofile['steamid'] . '")</script>';
+          echo '<script>console.log("DEBUG: Last Logoff:' . date("Y-m-d\TH:i:s\Z", $steamprofile['lastlogoff']) . '")</script>';
+          echo '<script>console.log("DEBUG: State:' . $steamprofile['personastate'] . '")</script>';
+          echo "Welcome back " . $steamprofile['personaname'] . "</br>";    
+          logoutbutton();
+          include ('config.php');
+          if (!isset($_GET['view'])) {
+            $ftp_connection = ftp_connect($host,$port);
+            ftp_login($ftp_connection, $user, $password);
+            if ($passiveftp == 1) {
+              ftp_pasv($ftp_connection, true);
+          } 
+    $logpath = $path;
+  } 
+?>  
+<div class="content">
+
+ <!-- Fixed navbar -->
+ <div class="navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
           <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -57,7 +90,6 @@ $logpath = $path;
           </div>
         </div>
       </div>
-
       <!-- Begin page content -->
       <div class="container">
         <div class="page-header">
@@ -194,7 +226,7 @@ Filename: <b>'.$_GET['view'].'</b>
       </div>
     </div>
 
-
+</div>
     <!-- Bootstrap core JavaScript
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
